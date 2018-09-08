@@ -11,11 +11,46 @@
             </div>
 
             <div>
-                Login: <BootstrapFormInput v-model="formData.login"/>
-                Password: <BootstrapFormInput v-model="formData.password"/>
+                Name:
+                <BootstrapFormInput
+                    v-model="formData.name"
+                    v-validate="'required'"
+                    name="form_name"
+                />
+                <span v-show="errors.has('form_name')" style="color: red">
+                   The field is required<br>
+                </span>
+                Email:
+                <BootstrapFormInput
+                        v-model="formData.email" type="email"
+                        v-validate="'email|required'"
+                        name="form_email"
+                />
+                <span v-show="errors.has('form_email')" style="color: darkred">
+                   Email is not valited<br>
+                </span>
+                UserName:
+                <BootstrapFormInput
+                        v-model="formData.userName"
+                        v-validate="'required'"
+                        name="form_username"
+                />
+                <span v-show="errors.has('form_username')" style="color: lightcoral">
+                   Name is not valited<br>
+                </span>
+                Password:
+                <BootstrapFormInput
+                        v-model="formData.password"
+                        type="password"
+                        name="form_password"
+                        v-validate="'min:6|required'"
+                />
+                <span v-show="errors.has('form_password')" style="color: darkgreen">
+                   Password less the 6 characters<br>
+                </span>
             </div>
             <div>
-                <BootstrapButton variant="success">
+                <BootstrapButton variant="success" @click="addUser">
                     Registration
                 </BootstrapButton>
             </div>
@@ -61,26 +96,53 @@
 
         data (){
             return{
+
                 authorize:false,
                 formData:{
-                    login:'',
+                    name:'',
+                    email:'',
+                    userName:'',
                     password:''
                 }
             };
         },
 
         methods:{
-             registrationRequest(){
+            validateForm(toastrType='error',toastrMessage='Please enter the fields'){
+               return this.$validator.validateAll()
+                    .then((result)=>{
+                        if (!result){
+                            this.$toastr(toastrType,toastrMessage,'Error');
+                            return false;
+                        }
+                        return true;
+                    });
 
-             }
+            },
+
+            addUser (){
+
+                this.validateForm()
+                    .then((isFormValid) => {
+                        if(!isFormValid) {
+                            return;
+                        }
+
+                        this.axios({
+                            url:'http://todo.loc/api/server.php',
+                            responseType:'json'
+                        })
+                            .then((serverRespounse)=>{
+                                const responseData=JSON.stringify(serverRespounse.data);
+
+                                if(responseData.result){
+
+                                    // ToDO redirect to auth page
+                                }
+                            });
+                    });
+            }
         }
-
-        // watch:{
-        //     'formData.login'(newVal){
-        //        console.log()
-        //     }
-        // }
-
     }
 </script>
 
