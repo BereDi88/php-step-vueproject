@@ -6,7 +6,6 @@
             :src="require('@/assets/img/reg.png')"
             width="150"
             height="100"
-
         />
       </div>
 
@@ -47,7 +46,7 @@
         />
         <span v-show="errors.has('form_password')" style="color: darkgreen">
                    Password less the 6 characters<br>
-                </span>
+        </span>
       </div>
       <div>
         <BootstrapButton variant="success" @click="addUser">
@@ -96,7 +95,6 @@
 
     data() {
       return {
-
         authorize: false,
         formData: {
           name: '',
@@ -108,20 +106,20 @@
     },
 
     methods: {
-      validateForm(toastrType = 'error', toastrMessage = 'Please enter the fields') {
+      validateForm(toastrType = 'Error', toastrMessage = 'Please enter the fields') {
         return this.$validator.validateAll()
           .then((result) => {
             if (!result) {
-              this.$toastr(toastrType, toastrMessage, 'Error');
-              return false;
+	            this.$toast.error(toastrMessage,toastrType);
+	            return false;
             }
+	          //this.$toast.success('Successfully inserted record!', 'OK');
             return true;
           });
 
       },
 
       addUser() {
-
         this.validateForm()
           .then((isFormValid) => {
             if (!isFormValid) {
@@ -138,18 +136,19 @@
             };
 
             this.axios({
-              method: 'post',
+              method: 'get',
               url: 'http://todo.loc/api/server.php',
-              responseType: 'json',
-              data: Object.assign(userData,{add_user:true})
+							responseType:'json',
+              params: Object.assign(userData, {add_user:true})
             })
               .then((serverRespounse) => {
-                const responseData = JSON.stringify(serverRespounse.data);
+	              const  response = serverRespounse.data;
 
-                if (responseData.result) {
-
-                  // ToDO redirect to auth page
-                }
+	              if (response.errors.length !==0 && response.errors.includes('email')){
+		              this.$toast.error('User with this email is already exist','Error');
+		              return;
+	              }
+	              this.$router.push('/auth');
               });
           });
       }

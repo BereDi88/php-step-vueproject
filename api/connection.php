@@ -20,7 +20,7 @@ class Connection{
   }
 
   return $db;
-//    print_r($dbParams);echo '<br>';
-   // print_r($db);
+    // print_r($dbParams);echo '<br>';
+	  // print_r($db);
   }
 }

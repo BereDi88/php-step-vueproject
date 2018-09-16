@@ -13,22 +13,16 @@
 
 <script>
     import styled from 'vue-styled-components';
-
     const  LinksBlock=styled('div')`margin-top: 100px`;
-
 
 export default {
   name: 'HelloWorld',
-
     components:{
         LinksBlock
     },
-
   data () {
     return {
       msg: 'Welcome to Your Vue.js App',
-
-
     }
   }
 }
