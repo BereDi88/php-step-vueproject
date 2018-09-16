@@ -35,6 +35,26 @@ if (!empty($_REQUEST['add_user'])&& $db){
   return;
 }
 
+if  (!empty($_REQUEST['auth_user']) && $db ){
+	$userData=json_decode($_REQUEST['formData'],true);
+	$checkEmail=isUserExists($userData,$db);
+	$res=isPasswordValid($userData,$db);
+
+	if(!$checkEmail){
+		echo json_encode([
+			'result' => false,
+			'errors' => ['email']
+		]);
+
+	}
+	echo json_encode([
+		'result' => $res,
+		'errors' => $res ? [] : ['password']
+	]);
+
+	return;
+}
+
 function isUserExists($userData,$connect){
 	$userEmail=$userData['email'];
 
@@ -52,4 +72,24 @@ function isUserExists($userData,$connect){
 	}
 
 	return (bool)count($dataFromDatabase);
+}
+
+function isPasswordValid($userData,$connect){
+	$sql = "SELECT * FROM users WHERE email = '" .$userData['email']. "'";
+
+	$response = $connect->query($sql, PDO::FETCH_ASSOC);
+	$dataFromDatabase=array();
+
+	$i=0;
+	while ($row = $response -> fetch()){
+		$dataFromDatabase[$i]['id'] = $row['id'];
+		$dataFromDatabase[$i]['email'] = $row['email'];
+		$dataFromDatabase[$i]['password'] = $row['password'];
+		$i++;
+	}
+	if ((bool)count($dataFromDatabase)){
+		return password_verify($userData['password'],$dataFromDatabase[0]['password']);
+	}
+
+
 }
